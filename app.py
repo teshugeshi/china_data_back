@@ -17,12 +17,14 @@ dbcon = pymysql.connect(
 
 # 设置路由，装饰器绑定触发函数
 @app.route("/")
-def hello_world():
+def data_provided():
     sql = "select * from city_data"
-    data = pd.read_sql(sql,dbcon).to_json(force_ascii=False)
-    return data
+    data = pd.read_sql(sql,dbcon)
+    data_provided=data[['城市','总得分（缩小间差）']]
+    data_provided.columns = ['name','value']
+    return data_provided.to_json(orient='records',force_ascii=False)
 
 if __name__ == "__main__":
     # debug=True 代码修改能运行时生效，app.run运行服务
     # host默认127.0.0.1 端口默认5000
-    app.run(debug=True)
+    app.run(host="0.0.0.0")
