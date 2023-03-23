@@ -1,10 +1,12 @@
 from flask import Flask,request, jsonify
+from flask_cors import CORS
 import pymysql
 import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
 
 # 创建Flask实例
 app = Flask(__name__)
+CORS(app, resources=r'/*')	# 注册CORS, "/*" 允许访问所有api
 
 dbcon = pymysql.connect(
   host="localhost",
