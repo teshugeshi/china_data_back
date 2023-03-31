@@ -19,7 +19,7 @@ dbcon = pymysql.connect(
 # 设置路由，装饰器绑定触发函数
 @app.route("/")
 def data_provided_allcity():
-    sql = "select * from china_data1"
+    sql = "select * from china_data"
     data = pd.read_sql(sql,dbcon)
     data_provided=data[['城市','总分']]
     data_provided.columns = ['name','value']
@@ -32,8 +32,8 @@ def data_provided_city():
     res_value=[]
     res_rank=[]
     for v in city_value:
-        sql = "select "+v+" from china_data1 where 城市="+city_name
-        sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from china_data1,(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
+        sql = "select "+v+" from china_data where 城市="+city_name
+        sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from china_data,(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
         data = pd.read_sql(sql,dbcon)
         data_rank=pd.read_sql(sql_rank,dbcon)
         res_value.append(data.iloc[0, 0])
