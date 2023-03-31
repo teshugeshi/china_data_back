@@ -25,7 +25,7 @@ def data_provided_allcity():
     data_provided.columns = ['name','value']
     return data_provided.to_json(orient='records',force_ascii=False)
 
-@app.route("/data_api")
+@app.route("/radar")
 def data_provided_city():
     city_name = request.args.get("city_name")
     city_value=['生态禀赋','文化资源','政策地位','经济规模','交通规模','创新能力','基本保障','生活水平','主流评价','教育服务','医疗服务','文化服务','主流媒体','网络接入','舆情干预','媒体影响','群体情绪','城市标签','就学吸引','就业吸引','旅游吸引','外资吸引','会展竞争']
@@ -44,4 +44,4 @@ def data_provided_city():
 if __name__ == "__main__":
     # debug=True 代码修改能运行时生效，app.run运行服务
     # host默认127.0.0.1 端口默认5000
-    app.run(host="0.0.0.0",debug=True)
+    app.run(host="0.0.0.0")
