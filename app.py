@@ -28,6 +28,7 @@ def data_provided_allcity():
 @app.route("/radar")
 def data_provided_city():
     city_name = request.args.get("city_name")
+    map={}
     city_value=['生态禀赋','文化资源','政策地位','经济规模','交通规模','创新能力','基本保障','生活水平','主流评价','教育服务','医疗服务','文化服务','主流媒体','网络接入','舆情干预','媒体影响','群体情绪','城市标签','就学吸引','就业吸引','旅游吸引','外资吸引','会展竞争']
     res_value=[]
     res_rank=[]
@@ -38,10 +39,12 @@ def data_provided_city():
         data_rank=pd.read_sql(sql_rank,dbcon)
         res_value.append(data.iloc[0, 0])
         res_rank.append(data_rank.iloc[0, 0])
-    res={'value':res_value,'rank':res_rank}
-    return res
+    res=[{'name':city_name[1:-1],'value':res_value,'rank':res_rank}]
+    return jsonify(res)
 
 if __name__ == "__main__":
     # debug=True 代码修改能运行时生效，app.run运行服务
     # host默认127.0.0.1 端口默认5000
+    app.config['JSON_AS_ASCII'] = False
+    app.config['JSONIFY_MIMETYPE'] = "application/json;charset=utf-8"
     app.run(host="0.0.0.0")
