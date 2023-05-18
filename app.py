@@ -30,11 +30,18 @@ dbcon = pymysql.connect(
 # 设置路由，装饰器绑定触发函数
 @app.route("/")
 def data_provided_allcity():
-    sql = "select * from china_data"
-    data = pd.read_sql(sql,dbcon)
-    data_provided=data[['城市','总分']]
-    data_provided.columns = ['name','value']
-    return data_provided.to_json(orient='records',force_ascii=False)
+    res=[]
+    sql_2020 = "select * from china_data"
+    sql_2021 = "select * from china_data_2021"
+    data_2020 = pd.read_sql(sql_2020,dbcon)
+    data_2021 = pd.read_sql(sql_2021,dbcon)
+    data_provided_2020=data_2020[['城市','总分']]
+    data_provided_2021=data_2021[['城市','总分']]
+    data_provided_2020.columns = ['name','value']
+    data_provided_2021.columns = ['name','value']
+    res.append({"year":2020,"data":data_provided_2020.to_json(orient='records',force_ascii=False)})
+    res.append({"year":2021,"data":data_provided_2021.to_json(orient='records',force_ascii=False)})
+    return res
 
 @app.route("/radar")
 def data_provided_city():
@@ -60,7 +67,7 @@ def data_provided_city():
 @app.route("/softpower")
 def data_provided_index():
     data_index = request.args.get("data_index")
-    data_index=data_index[1:-1]
+    # data_index=data_index[1:-1]
     all_index=['生态禀赋','文化资源','政策地位','经济规模','交通规模','创新能力','基本保障','生活水平','主流评价','教育服务','医疗服务','文化服务','主流媒体','网络接入','舆情干预','媒体影响','群体情绪','城市标签','就学吸引','就业吸引','旅游吸引','外资吸引','会展竞争']
     all_city=['石家庄','太原','呼和浩特','沈阳','长春','哈尔滨','南京','杭州','合肥','福州','南昌','郑州','武汉','长沙','广州','南宁','海口','成都','贵阳','昆明','拉萨','西安','兰州','西宁','银川','乌鲁木齐','深圳','大连','宁波','青岛','厦门','苏州']
     res=[]
@@ -79,6 +86,26 @@ def data_provided_index():
         res.append(temp_data)
     # print(res)
     return jsonify(res)
+
+# @app.route("/scatter")
+# def data_provided_scatter():
+#     res=[]
+#     year= request.args.get("year")
+#     if year not in ['2020','2021']:
+#         return res
+#     sql= "select * from city_scatter_"+year
+#     # sql_2021 = "select * from city_scatter_2021"
+#     data = pd.read_sql(sql,dbcon)
+#     # data_2021 = pd.read_sql(sql_2021,dbcon)
+#     data_provided=data[['城市','支撑性得分','效应性得分']]
+#     for d in data_provided:
+#         res.append([data['城市'],data['支撑性得分']])
+#     # print(data_provided)
+#     # data_provided_2021=data_2021[['城市','支撑性得分','效应性得分']]
+#     # data_provided_2020.columns = ['name','value']
+#     # data_provided_2021.columns = ['name','value']
+#     # res.append(data_provided.to_json(orient='records',force_ascii=False))
+#     return res
 
 if __name__ == "__main__":
     # debug=True 代码修改能运行时生效，app.run运行服务
