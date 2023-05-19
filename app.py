@@ -2,6 +2,7 @@ from flask import Flask,request, jsonify
 from flask_cors import CORS
 import pymysql
 import pandas as pd
+import threading
 
 # 创建Flask实例
 app = Flask(__name__)
@@ -27,15 +28,18 @@ dbcon = pymysql.connect(
   connect_timeout=10,
  )
 
+lock = threading.Lock()
+
 # 设置路由，装饰器绑定触发函数
-#todo 多线程连接数据库报错问题
 @app.route("/")
 def data_provided_allcity():
     res=[]
     sql_2020 = "select * from china_data_2020"
     sql_2021 = "select * from china_data_2021"
+    lock.acquire()
     data_2020 = pd.read_sql(sql_2020,dbcon)
     data_2021 = pd.read_sql(sql_2021,dbcon)
+    lock.release()
     data_provided_2020=data_2020[['城市','总分']]
     data_provided_2021=data_2021[['城市','总分']]
     data_provided_2020.columns = ['name','value']
@@ -57,11 +61,13 @@ def data_provided_city():
     for v in city_value:
         sql = "select "+v+" from "+table+" where 城市="+city_name
         #Mysql8.x
-        # sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+v+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
+        sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+v+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
         #Mysql5.x
-        sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
+        # sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
+        lock.acquire()
         data = pd.read_sql(sql,dbcon)
         data_rank=pd.read_sql(sql_rank,dbcon)
+        lock.release()
         res_value.append(format(data.iloc[0, 0],'.2f'))
         res_rank.append(float(data_rank.iloc[0, 0]))
     res=[{'name':city_name[1:-1],'value':res_value,'rank':res_rank}]
@@ -84,11 +90,13 @@ def data_provided_index():
         city_name="\""+city_name+"\""
         sql = "select "+data_index+" from "+table+" where 城市="+city_name
         #Mysql8.x
-        # sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
+        sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
         #Mysql5.x
-        sql_rank="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
+        # sql_rank="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
+        lock.acquire()
         data = pd.read_sql(sql,dbcon)
         data_rank=pd.read_sql(sql_rank,dbcon)
+        lock.release()
         temp_data={'name':city_name[1:-1],'data':float(data.iloc[0, 0]),'rank':float(data_rank.iloc[0, 0])}
         res.append(temp_data)
     # print(res)
@@ -101,7 +109,9 @@ def data_provided_scatter():
     if year not in ['2020','2021']:
         return res
     sql= "select * from city_scatter_"+year
+    lock.acquire()
     data = pd.read_sql(sql,dbcon)
+    lock.release()
     for a,b,c,d in  zip(data['支撑性得分'], data['效应性得分'],data['城市'],data['常住人口']):
         res.append([a,b,c,d])
     return jsonify(res)
