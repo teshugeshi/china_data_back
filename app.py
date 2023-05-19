@@ -20,7 +20,7 @@ CORS(app, resources=r'/*')	# 注册CORS, "/*" 允许访问所有api
 dbcon = pymysql.connect(
   host="127.0.0.1",
   user="root",
-  password="123456",
+  password="root",
   db = "china_data",
   port=3306,
   charset='utf8mb4',
@@ -28,6 +28,7 @@ dbcon = pymysql.connect(
  )
 
 # 设置路由，装饰器绑定触发函数
+#todo 多线程连接数据库报错问题
 @app.route("/")
 def data_provided_allcity():
     res=[]
@@ -39,9 +40,9 @@ def data_provided_allcity():
     data_provided_2021=data_2021[['城市','总分']]
     data_provided_2020.columns = ['name','value']
     data_provided_2021.columns = ['name','value']
-    res.append({"year":2020,"data":data_provided_2020.to_json(orient='records',force_ascii=False)})
-    res.append({"year":2021,"data":data_provided_2021.to_json(orient='records',force_ascii=False)})
-    return res
+    res.append({"year":2020,"data":data_provided_2020.to_dict(orient='records')})
+    res.append({"year":2021,"data":data_provided_2021.to_dict(orient='records')})
+    return jsonify(res)
 
 @app.route("/radar")
 def data_provided_city():
@@ -53,9 +54,9 @@ def data_provided_city():
     for v in city_value:
         sql = "select "+v+" from china_data where 城市="+city_name
         #Mysql8.x
-        sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+v+" DESC) city_rank FROM china_data) SELECT city_rank FROM a WHERE 城市="+city_name
+        # sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+v+" DESC) city_rank FROM china_data) SELECT city_rank FROM a WHERE 城市="+city_name
         #Mysql5.x
-        # sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from china_data,(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
+        sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from china_data,(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
         data = pd.read_sql(sql,dbcon)
         data_rank=pd.read_sql(sql_rank,dbcon)
         res_value.append(format(data.iloc[0, 0],'.2f'))
@@ -77,9 +78,9 @@ def data_provided_index():
         city_name="\""+city_name+"\""
         sql = "select "+data_index+" from china_data where 城市="+city_name
         #Mysql8.x
-        sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM china_data) SELECT city_rank FROM a WHERE 城市="+city_name
+        # sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM china_data) SELECT city_rank FROM a WHERE 城市="+city_name
         #Mysql5.x
-        # sql_rank="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from china_data,(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
+        sql_rank="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from china_data,(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
         data = pd.read_sql(sql,dbcon)
         data_rank=pd.read_sql(sql_rank,dbcon)
         temp_data={'name':city_name[1:-1],'data':float(data.iloc[0, 0]),'rank':float(data_rank.iloc[0, 0])}
