@@ -21,7 +21,7 @@ CORS(app, resources=r'/*')	# 注册CORS, "/*" 允许访问所有api
 dbcon = pymysql.connect(
   host="127.0.0.1",
   user="root",
-  password="123456",
+  password="root",
   db = "china_data",
   port=3306,
   charset='utf8mb4',
@@ -61,9 +61,9 @@ def data_provided_city():
     for v in city_value:
         sql = "select "+v+" from "+table+" where 城市="+city_name
         # Mysql8.x
-        sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+v+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
+        # sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+v+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
         #Mysql5.x
-        # sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
+        sql_rank="SELECT aaa.rank from(select `城市`,`"+v+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+v+"` desc ) as aaa where `城市` ="+city_name
         lock.acquire()
         data = pd.read_sql(sql,dbcon)
         data_rank=pd.read_sql(sql_rank,dbcon)
@@ -94,11 +94,11 @@ def data_provided_index():
         sql = "select "+data_index+" from "+table+" where 城市="+city_name
         sql2 = "select "+data_index+" from "+table2+" where 城市="+city_name
         #Mysql8.x
-        sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
-        sql_rank2="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM "+table2+") SELECT city_rank FROM a WHERE 城市="+city_name
+        # sql_rank="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM "+table+") SELECT city_rank FROM a WHERE 城市="+city_name
+        # sql_rank2="WITH a AS(SELECT 城市,RANK( ) OVER (ORDER BY "+data_index+" DESC) city_rank FROM "+table2+") SELECT city_rank FROM a WHERE 城市="+city_name
         #Mysql5.x
-        # sql_rank="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
-        # sql_rank2="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from "+table2+",(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
+        sql_rank="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from "+table+",(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
+        sql_rank2="select aaa.rank from(select `城市`,`"+data_index+"`, @rk := @rk+1 as rank from "+table2+",(select @rk:=0)  a order by `"+data_index+"` desc ) as aaa where `城市` ="+city_name
         lock.acquire()
         data = pd.read_sql(sql,dbcon)
         data2 = pd.read_sql(sql2,dbcon)
@@ -129,43 +129,43 @@ def data_provided_scatter():
         res.append([a,b,c,d])
     return jsonify(res)
 
-# @app.route("/wordcloud")
-# def data_provided_wordcloud():
-#     res=[]
-#     year= request.args.get("year")
-#     if year not in ['2020','2021']:
-#         return res
-#     if year=='2020':
-#         res=[{'name':"舆情干预",'value':100},{'name':"创新能力",'value':100},{'name':"政策地位",'value':80},{'name':"主流评价",'value':80},{'name':"城市标签",'value':80},{'name':"媒体影响",'value':60},{'name':"生活水平",'value':60},{'name':"医疗服务",'value':60},{'name':"就业吸引",'value':40},{'name':"就学吸引",'value':20},{'name':"交通规模",'value':20}]
-#     if year=='2021':
-#         res=[{'name':"医疗服务",'value':100},{'name':"舆情干预",'value':100},{'name':"创新能力",'value':100},{'name':"政策地位",'value':80},{'name':"主流评价",'value':80},{'name':"城市标签",'value':80},{'name':"媒体影响",'value':60},{'name':"就学吸引",'value':40},{'name':"生活水平",'value':40},{'name':"交通规模",'value':20}]
-#     return jsonify(res)
-
 @app.route("/wordcloud")
 def data_provided_wordcloud():
     res=[]
-    word_num=23
-    weight=[33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1]
-    # weight=[1 for _ in range(33)]
-    all_index=['生态禀赋','文化资源','政策地位','经济规模','交通规模','创新能力','基本保障','生活水平','主流评价','教育服务','医疗服务','文化服务','主流媒体','网络接入','舆情干预','媒体影响','群体情绪','城市标签','就学吸引','就业吸引','旅游吸引','外资吸引','会展竞争']
-    all_value={'生态禀赋':0,'文化资源':0,'政策地位':0,'经济规模':0,'交通规模':0,'创新能力':0,'基本保障':0,'生活水平':0,'主流评价':0,'教育服务':0,'医疗服务':0,'文化服务':0,'主流媒体':0,'网络接入':0,'舆情干预':0,'媒体影响':0,'群体情绪':0,'城市标签':0,'就学吸引':0,'就业吸引':0,'旅游吸引':0,'外资吸引':0,'会展竞争':0}
     year= request.args.get("year")
     if year not in ['2020','2021']:
-        return jsonify(res)
-    table="china_data_"+year
-    sql= "select * from "+table
-    lock.acquire()
-    df= pd.read_sql(sql,dbcon)
-    lock.release()
-    df_data_order = df.sort_values(by=['总分'],ascending=[False])
-    df_data_order.reset_index(drop=True, inplace=True)
-    for ind,row in df_data_order.iterrows():
-        for index in all_index:
-            all_value[index]=all_value[index]+row[index]*weight[ind]
-    all_value_order=dict(sorted(all_value.items(),key=lambda x:x[1],reverse=True))
-    for k,v in all_value_order.items():
-        res.append({'name':k,'value':round(v, 0)})
-    return jsonify(res[:word_num])
+        return res
+    if year=='2020':
+        res=[{'name':"舆情干预",'value':100},{'name':"创新能力",'value':100},{'name':"政策地位",'value':80},{'name':"主流评价",'value':80},{'name':"城市标签",'value':80},{'name':"媒体影响",'value':60},{'name':"生活水平",'value':60},{'name':"医疗服务",'value':60},{'name':"就业吸引",'value':40},{'name':"就学吸引",'value':20},{'name':"交通规模",'value':20}]
+    if year=='2021':
+        res=[{'name':"医疗服务",'value':100},{'name':"舆情干预",'value':100},{'name':"创新能力",'value':100},{'name':"政策地位",'value':80},{'name':"主流评价",'value':80},{'name':"城市标签",'value':80},{'name':"媒体影响",'value':60},{'name':"就学吸引",'value':40},{'name':"生活水平",'value':40},{'name':"交通规模",'value':20}]
+    return jsonify(res)
+
+# @app.route("/wordcloud")
+# def data_provided_wordcloud():
+#     res=[]
+#     word_num=23
+#     weight=[33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1]
+#     # weight=[1 for _ in range(33)]
+#     all_index=['生态禀赋','文化资源','政策地位','经济规模','交通规模','创新能力','基本保障','生活水平','主流评价','教育服务','医疗服务','文化服务','主流媒体','网络接入','舆情干预','媒体影响','群体情绪','城市标签','就学吸引','就业吸引','旅游吸引','外资吸引','会展竞争']
+#     all_value={'生态禀赋':0,'文化资源':0,'政策地位':0,'经济规模':0,'交通规模':0,'创新能力':0,'基本保障':0,'生活水平':0,'主流评价':0,'教育服务':0,'医疗服务':0,'文化服务':0,'主流媒体':0,'网络接入':0,'舆情干预':0,'媒体影响':0,'群体情绪':0,'城市标签':0,'就学吸引':0,'就业吸引':0,'旅游吸引':0,'外资吸引':0,'会展竞争':0}
+#     year= request.args.get("year")
+#     if year not in ['2020','2021']:
+#         return jsonify(res)
+#     table="china_data_"+year
+#     sql= "select * from "+table
+#     lock.acquire()
+#     df= pd.read_sql(sql,dbcon)
+#     lock.release()
+#     df_data_order = df.sort_values(by=['总分'],ascending=[False])
+#     df_data_order.reset_index(drop=True, inplace=True)
+#     for ind,row in df_data_order.iterrows():
+#         for index in all_index:
+#             all_value[index]=all_value[index]+row[index]*weight[ind]
+#     all_value_order=dict(sorted(all_value.items(),key=lambda x:x[1],reverse=True))
+#     for k,v in all_value_order.items():
+#         res.append({'name':k,'value':round(v, 0)})
+#     return jsonify(res[:word_num])
 
 if __name__ == "__main__":
     # 代码修改能运行时生效，app.run运行服务
