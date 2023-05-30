@@ -94,7 +94,7 @@ def get_weight_value(table,weights,fields,result):
     # 创建游标对象
     cursor = cnx.cursor()
     num=len(weights)
-    update_query = "UPDATE "+table+" SET "+'result'+"="
+    update_query = "UPDATE "+table+" SET "+result+"="
     for n in range(num):
         update_query=update_query+weights[n]+'*'+fields[n]+'+'
     update_query=update_query[:-1]
