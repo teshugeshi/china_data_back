@@ -1,9 +1,9 @@
 import mysql.connector
 
 cnx = mysql.connector.connect(
-        host="localhost",
+        host="39.107.97.152",
         user="root",
-        password="123456",
+        password="Ccbupt1234!",
         database="china_data"
     )
 
@@ -27,9 +27,8 @@ def get_standard_value(table,field,result):
         cursor.execute(update_query, values)
     # 提交更改到数据库
     cnx.commit()
-    # 关闭游标和数据库连接
+    # 关闭游标
     cursor.close()
-    cnx.close()
 
 def get_average_value(table,field1,field2,result):
     # 创建游标对象
@@ -46,9 +45,8 @@ def get_average_value(table,field1,field2,result):
         cursor.execute(update_query, values)
     # # 提交更改到数据库
     cnx.commit()
-    # 关闭游标和数据库连接
+    # 关闭游标
     cursor.close()
-    cnx.close()
 
 def get_division_value(table,field1,field2,result):
     # 创建游标对象
@@ -65,9 +63,8 @@ def get_division_value(table,field1,field2,result):
         cursor.execute(update_query, values)
     # # 提交更改到数据库
     cnx.commit()
-    # 关闭游标和数据库连接
+    # 关闭游标
     cursor.close()
-    cnx.close()
 
 def get_weight_value(table,weights,fields,result):
     # 创建游标对象
@@ -79,9 +76,8 @@ def get_weight_value(table,weights,fields,result):
     update_query=update_query[:-1]
     cursor.execute(update_query)
     cnx.commit()
-    # 关闭游标和数据库连接
+    # 关闭游标
     cursor.close()
-    cnx.close()
 
 def get_allcity_data(years):
     field_num=23
@@ -98,12 +94,11 @@ def get_allcity_data(years):
                 update_query = "UPDATE "+table+" SET "+city_value[num]+"=(SELECT "+score_field[num]+" FROM "+table_name_prefix[num]+year+" WHERE 城市=\""+city_name+"\") "+"WHERE 城市=\""+city_name+"\""
                 cursor.execute(update_query)
     cnx.commit()
-    # 关闭游标和数据库连接
+    # 关闭游标
     cursor.close()
-    cnx.close()
 
 if __name__ == '__main__':
-    # get_division_value('ecology_2020','水资源','常住人口','人均')
+    # # get_division_value('ecology_2020','水资源','常住人口','人均')
     get_standard_value('ecology_2020','人均','标准化值')
     get_average_value('ecology_2020','环境舒适度','标准化值','均分')
     get_standard_value('ecology_2020','均分','标准化得分')
@@ -139,3 +134,4 @@ if __name__ == '__main__':
     get_average_value('education_service_2021','标准化值','标准化值1','平均值')
 
     get_allcity_data(['2020','2021'])
+    cnx.close()
