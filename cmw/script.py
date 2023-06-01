@@ -1,13 +1,13 @@
 import mysql.connector
 
-def get_standard_value(table,field,result):
-    # 连接到MySQL数据库
-    cnx = mysql.connector.connect(
+cnx = mysql.connector.connect(
         host="localhost",
         user="root",
         password="123456",
         database="china_data"
     )
+
+def get_standard_value(table,field,result):
     # 创建游标对象
     cursor = cnx.cursor()
     # 查询数据库中的数据
@@ -32,13 +32,6 @@ def get_standard_value(table,field,result):
     cnx.close()
 
 def get_average_value(table,field1,field2,result):
-    # 连接到MySQL数据库
-    cnx = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="123456",
-        database="china_data"
-    )
     # 创建游标对象
     cursor = cnx.cursor()
     # 查询数据库中的数据
@@ -58,13 +51,6 @@ def get_average_value(table,field1,field2,result):
     cnx.close()
 
 def get_division_value(table,field1,field2,result):
-    # 连接到MySQL数据库
-    cnx = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="123456",
-        database="china_data"
-    )
     # 创建游标对象
     cursor = cnx.cursor()
     # 查询数据库中的数据
@@ -84,13 +70,6 @@ def get_division_value(table,field1,field2,result):
     cnx.close()
 
 def get_weight_value(table,weights,fields,result):
-    # 连接到MySQL数据库
-    cnx = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="123456",
-        database="china_data"
-    )
     # 创建游标对象
     cursor = cnx.cursor()
     num=len(weights)
@@ -110,13 +89,6 @@ def get_allcity_data(years):
     city_value=['生态禀赋','文化资源','政策地位','经济规模','交通规模','创新能力','基本保障','生活水平','主流评价','教育服务','医疗服务','文化服务','主流媒体','网络接入','舆情干预','媒体影响','群体情绪','城市标签','就学吸引','就业吸引','旅游吸引','外资吸引','会展竞争']
     table_name_prefix=['ecology_','cultural_resources_','policy_','economy_','traffic_','innovate_','basic_security_','living_standard_','main_evaluate_','education_service_','medical_','culture_','main_media_','network_access_','public_sentiment_','media_influ_','group_emotions_','city_label_','education_attraction_','employment_attraction_','tourist_attraction_','foreign_investment_attraction_','exhibition_competition_']
     score_field=['标准化得分','标准化值','评分','标准化值','标准化值','标准化值','标准化值','得分','标准化值','平均值','标准化值','平均','平均值','标准化值','标准化值','标准化值4','标准化值','标准化值','标准化值','均分','标准化值','均分','标准化值']
-    # 连接到MySQL数据库
-    cnx = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="123456",
-        database="china_data"
-    )
     # 创建游标对象
     cursor = cnx.cursor()
     for year in years:
@@ -129,8 +101,6 @@ def get_allcity_data(years):
     # 关闭游标和数据库连接
     cursor.close()
     cnx.close()
-        
-
 
 if __name__ == '__main__':
     # get_division_value('ecology_2020','水资源','常住人口','人均')
@@ -146,4 +116,26 @@ if __name__ == '__main__':
     get_weight_value('cultural_resources_2021',['0.45','0.42','0.12','0.01'],['世界遗产','人类非遗','国家非遗','省级非遗'],'综合打分')
     get_standard_value('cultural_resources_2020','综合打分','标准化值')
     get_standard_value('cultural_resources_2021','综合打分','标准化值')
+
+    get_standard_value('economy_2020','GDP总量','标准化值')
+    get_standard_value('economy_2021','GDP总量','标准化值')
+
+    get_standard_value('traffic_2020','客运总量','标准化值')
+    get_standard_value('traffic_2021','客运总量','标准化值')
+
+    get_standard_value('innovate_2020','创新指数','标准化值')
+    get_standard_value('innovate_2021','创新指数','标准化值')
+
+    get_standard_value('basic_security_2020','平均值','标准化值')
+    get_standard_value('basic_security_2021','平均值','标准化值')
+
+    get_average_value('living_standard_2020','标准化值','标准化值1','得分')
+    get_average_value('living_standard_2021','标准化值','标准化值1','得分')
+
+    get_standard_value('main_evaluate_2020','文明城市得分','标准化值')
+    get_standard_value('main_evaluate_2021','文明城市得分','标准化值')
+
+    get_average_value('education_service_2020','标准化值','标准化值1','平均值')
+    get_average_value('education_service_2021','标准化值','标准化值1','平均值')
+
     get_allcity_data(['2020','2021'])
