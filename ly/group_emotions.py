@@ -80,10 +80,11 @@ def calculate(year):
         positive = row[2]
         # 标准化值 由计算得到
         standard = (positive - min) / (max - min)
-        print(standard)
-        sql = "update group_emotions_" + str(year) + " set 标准化值 = " + str(standard) + " where 城市 = '" + str(city) + "'"
-        print(sql)
-        cursor.execute(sql)
+        if not pd.isna(standard):
+            print(standard)
+            sql = "update group_emotions_" + str(year) + " set 标准化值 = " + str(standard) + " where 城市 = '" + str(city) + "'"
+            print(sql)
+            cursor.execute(sql)
     dbcon.commit()
 
 
@@ -99,7 +100,7 @@ if __name__ == '__main__':
         # 2020 2021
         year = years[i][0]
         # 每一个新年份先执行一遍该函数，向对应的年份表中插入数据
-        insert_basic(year)
+        # insert_basic(year)
         # 以后定时执行这个函数即可
         calculate(year)
     # 关闭连接池

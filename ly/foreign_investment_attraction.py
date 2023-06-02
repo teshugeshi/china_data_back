@@ -80,9 +80,10 @@ def calculate(year):
         standard2 = (foreign_direct_investment_projects - min_foreign_direct_investment_projects) / (max_foreign_direct_investment_projects - min_foreign_direct_investment_projects)
         # 均分
         average_score = (standard1 + standard2) / 2
-        sql = "update foreign_investment_attraction_" + str(year) + " set 标准化值1 = " + str(standard1) + ", 标准化值2 = " + str(standard2) + ", 均分 = " + str(average_score) + " where 城市 = '" + str(city) + "'"
-        print(sql)
-        cursor.execute(sql)
+        if not pd.isna(average_score):
+            sql = "update foreign_investment_attraction_" + str(year) + " set 标准化值1 = " + str(standard1) + ", 标准化值2 = " + str(standard2) + ", 均分 = " + str(average_score) + " where 城市 = '" + str(city) + "'"
+            print(sql)
+            cursor.execute(sql)
     dbcon.commit()
 
 
@@ -98,7 +99,7 @@ if __name__ == '__main__':
         # 2020 2021
         year = years[i][0]
         # 每一个新年份先执行一遍该函数，向对应的年份表中插入数据
-        insert_basic(year)
+        # insert_basic(year)
         # 以后定时执行这个函数即可
         calculate(year)
     # 关闭连接池

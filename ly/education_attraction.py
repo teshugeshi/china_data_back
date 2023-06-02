@@ -111,9 +111,10 @@ def calculate(year):
         comprehensive_score = num_985 * weight_985 + num_211 * weight_211 + num_ordinary_higher_school * weight_ordinary_higher_school + num_secondary_positions * weight_secondary_positions
         # 标准化值 由计算得到
         standard = (comprehensive_score - min_comprehensive_score) / (max_comprehensive_score - min_comprehensive_score)
-        print(standard)
-        sql = "update education_attraction_" + str(year) + " set 标准化值 = " + str(standard) + " where 城市 = '" + str(city) + "'"
-        print(sql)
+        if not pd.isna(standard):
+            print(standard)
+            sql = "update education_attraction_" + str(year) + " set 标准化值 = " + str(standard) + " where 城市 = '" + str(city) + "'"
+            print(sql)
         cursor.execute(sql)
     dbcon.commit()
 
@@ -130,7 +131,7 @@ if __name__ == '__main__':
         # 2020 2021
         year = years[i][0]
         # 每一个新年份先执行一遍该函数，向对应的年份表中插入数据
-        insert_basic(year)
+        # insert_basic(year)
         # 以后定时执行这个函数即可
         calculate(year)
     # 关闭连接池

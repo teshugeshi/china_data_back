@@ -92,6 +92,7 @@ def get_allcity_data(years):
         for num in range(field_num):
             for city_name in all_city:
                 update_query = "UPDATE "+table+" SET "+city_value[num]+"=(SELECT "+score_field[num]+" FROM "+table_name_prefix[num]+year+" WHERE 城市=\""+city_name+"\") "+"WHERE 城市=\""+city_name+"\""
+                print(update_query)
                 cursor.execute(update_query)
     cnx.commit()
     # 关闭游标
@@ -134,4 +135,6 @@ if __name__ == '__main__':
     get_average_value('education_service_2021','标准化值','标准化值1','平均值')
 
     get_allcity_data(['2020','2021'])
+    
+    print('数据库更新完成')
     cnx.close()

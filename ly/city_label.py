@@ -81,9 +81,10 @@ def calculate(year):
         city_label_score = row[2]
         # 标准化值 由计算得到
         standard = (city_label_score - min) / (max - min)
-        print(standard)
-        sql = "update city_label_" + str(year) + " set 标准化值 = " + str(standard) + " where 城市 = '" + str(city) + "'"
-        print(sql)
+        if not pd.isna(standard):
+            print(standard)
+            sql = "update education_attraction_" + str(year) + " set 标准化值 = " + str(standard) + " where 城市 = '" + str(city) + "'"
+            print(sql)
         cursor.execute(sql)
     dbcon.commit()
 

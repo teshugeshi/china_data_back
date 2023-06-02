@@ -78,7 +78,7 @@ def calculate(year):
     max_employment_rate = 0.0
     min_employment_rate = 1.0
     # 遍历获得就业率的最大值最小值
-    for i in range(row_count):
+    for i in range(row_count-3):
         employlent_rate = employment_rates[i][0]
         max_employment_rate = max(max_employment_rate, employlent_rate)
         min_employment_rate = min(min_employment_rate, employlent_rate)
@@ -118,11 +118,12 @@ def calculate(year):
         standard3 = (max_housing_price - housing_price) / (max_housing_price - min_housing_price)
         # 均分
         average_score = (standard1 + standard2 + standard3) / 3
-        print(standard1)
-        sql1 = "update employment_attraction_" + str(year) + " set 标准化值1 = " + str(standard1) + " , 标准化值2 = " + str(
-            standard2) + " , 标准化值3 = " + str(standard3) + " , 均分 = " + str(average_score) + " where 城市 = '" + str(
-            city) + "'"
-        print(sql1)
+        if not pd.isna(standard1):
+            print(standard1)
+            sql1 = "update employment_attraction_" + str(year) + " set 标准化值1 = " + str(standard1) + " , 标准化值2 = " + str(
+                standard2) + " , 标准化值3 = " + str(standard3) + " , 均分 = " + str(average_score) + " where 城市 = '" + str(
+                city) + "'"
+            print(sql1)
         cursor.execute(sql1)
     dbcon.commit()
 
@@ -139,7 +140,7 @@ if __name__ == '__main__':
         # 2020 2021
         year = years[i][0]
         # 每一个新年份先执行一遍该函数，向对应的年份表中插入数据
-        insert_basic(year)
+        # insert_basic(year)
         # 以后定时执行这个函数即可
         calculate(year)
     # 关闭连接池
